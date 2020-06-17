@@ -17,9 +17,10 @@ glm::vec2 limit_mag(const glm::vec2 &vec, float v) {
 }
 }  // namespace
 
-void BoidRenderer::render(entt::registry &registry, NVGcontext *nvg) {
+void BoidRenderer::render(entt::registry &registry, const glm::vec2 &screen_size, NVGcontext *nvg) {
   static const NVGpaint paint =
       nvgLinearGradient(nvg, 0, 0, size, 0, nvgRGBf(0, 0, 0), nvgRGBf(1, 0, 0));
+
   auto view = registry.view<engine::Position, engine::Velocity, Boid>();
   view.each([nvg, this](auto &pos, auto &vel, auto &boid) {
     nvgSave(nvg);
@@ -30,14 +31,13 @@ void BoidRenderer::render(entt::registry &registry, NVGcontext *nvg) {
     nvgMoveTo(nvg, 0, -size / 2);
     nvgLineTo(nvg, 0, size / 2);
     nvgLineTo(nvg, size, 0);
-    // nvgFillColor(nvg, nvgRGBA(255, 192, 0, 255));
     nvgFillPaint(nvg, paint);
     nvgFill(nvg);
     nvgRestore(nvg);
   });
 }
 
-void BoidRenderer::update(entt::registry &registry, float dt) {
+void BoidRenderer::update(entt::registry &registry, const glm::vec2 &screen_size, float dt) {
   auto view = registry.view<engine::Position, engine::Velocity, Boid>();
   while (view.size() > num_boids) {
     auto beg = view.begin();
@@ -46,7 +46,7 @@ void BoidRenderer::update(entt::registry &registry, float dt) {
     }
     registry.destroy(beg, view.end());
   }
-  std::uniform_real_distribution<float> pos_x{0, 500}, pos_y{0, 500};
+  std::uniform_real_distribution<float> pos_x{0, screen_size.x}, pos_y{0, screen_size.y};
   std::normal_distribution<float> vel_dist{0, max_velocity};
   while (view.size() < num_boids) {
     auto ent = registry.create();
@@ -107,21 +107,19 @@ void BoidRenderer::update(entt::registry &registry, float dt) {
 
     vel.Value = limit_mag(vel.Value, max_velocity);
 
-    int SCREEN_WIDTH = 500;
     pos.Value += vel.Value * dt;
-    if (pos.Value.x < 0 || pos.Value.x > SCREEN_WIDTH) {
+    if (pos.Value.x < 0 || pos.Value.x > screen_size.x) {
       vel.Value.x *= -1;
       pos.Value.x += vel.Value.x * dt * 2;
     }
-    if (pos.Value.y < 0 || pos.Value.y > SCREEN_WIDTH) {
+    if (pos.Value.y < 0 || pos.Value.y > screen_size.y) {
       vel.Value.y *= -1;
       pos.Value.y += vel.Value.y * dt * 2;
     }
-    // pos.Value = glm::clamp(pos.Value, glm::vec2{0, 0}, glm::vec2{SCREEN_WIDTH, SCREEN_WIDTH});
   }
 }
 void BoidRenderer::render_ui(entt::registry &registry) {
-  if (ImGui::Begin("Boids")) {
+  if (ImGui::Begin("Settings")) {
     ImGui::SliderInt("Number", &num_boids, 0, 500);
     ImGui::SliderInt("Size", &size, 10, 50);
     ImGui::SliderFloat("Min Distance", &min_distance, 0, 250);

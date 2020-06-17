@@ -24,14 +24,6 @@ bool Engine::init(const EngineInitParams &params) {
 
   this->params = params;
 
-  std::filesystem::path dir = std::filesystem::current_path();
-  while (!std::filesystem::exists(dir / "assets")) {
-    dir = dir.parent_path();
-    if (dir.parent_path() == dir) {
-      break;
-    }
-  }
-  asset_dir = dir / "assets";
   return true;
 }
 
@@ -159,9 +151,10 @@ void Engine::render_frame() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  glm::vec2 screen_size{params.Width, params.Height};
   nvgBeginFrame(nvg, params.Width, params.Height, 1.0);
   for (auto &sys : render_systems) {
-    sys->render(registry);
+    sys->render(registry, screen_size);
   }
   nvgEndFrame(nvg);
 
@@ -218,15 +211,16 @@ void Engine::update() {
   auto deltaTicks = currentTicks - previousTicks;
   auto deltaTime = deltaTicks / 1000.0f;
   previousTicks = currentTicks;
+  glm::vec2 screen_size{params.Width, params.Height};
   for (auto &sys : update_systems) {
-    sys->update(registry, deltaTime);
+    sys->update(registry, screen_size, deltaTime);
   }
 }
 void Engine::add_ui_system(std::shared_ptr<UISystem> &&system) {
   ui_systems.emplace_back(std::move(system));
 }
 
-void Engine::add_update_system(std::shared_ptr<System> &&system) {
+void Engine::add_update_system(std::shared_ptr<UpdateSystem> &&system) {
   update_systems.emplace_back(std::move(system));
 }
 
@@ -273,7 +267,7 @@ bool Engine::init_openglmatrices(const EngineInitParams &params) {
   glLoadIdentity();
 */
   // Initialize clear color
-  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClearDepth(1.0f);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_DEPTH_TEST);
@@ -307,4 +301,10 @@ bool Engine::init_nanovg() {
     return false;
   }
   return true;
+}
+void Engine::set_clear_color(const glm::vec3 &color) {
+  clear_color = color;
+  if (window) {
+    glClearColor(clear_color.r, clear_color.g, clear_color.b, 1.0f);
+  }
 }

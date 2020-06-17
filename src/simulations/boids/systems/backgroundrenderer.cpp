@@ -9,7 +9,7 @@ struct Ball {};
 
 BackgroundRenderer::BackgroundRenderer() : sprite("textures/transparent.png") {}
 
-void BackgroundRenderer::render(entt::registry &registry) {
+void BackgroundRenderer::render(entt::registry &registry, const glm::vec2 &screen_size) {
   sprite.bind();
   auto view = registry.view<engine::Position, Ball>();
   while (view.size() != 10) {

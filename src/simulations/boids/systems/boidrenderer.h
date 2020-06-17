@@ -4,10 +4,12 @@
 #include <engine/systems/system.h>
 #include <glm/ext.hpp>
 #include <random>
-class BoidRenderer : public engine::NVGSystem, public engine::System, public engine::UISystem {
+class BoidRenderer : public engine::NVGSystem,
+                     public engine::UpdateSystem,
+                     public engine::UISystem {
  public:
-  void render(entt::registry &registry, NVGcontext *nvg) override;
-  void update(entt::registry &registry, float dt) override;
+  void render(entt::registry &registry, const glm::vec2 &screen_size, NVGcontext *nvg) override;
+  void update(entt::registry &registry, const glm::vec2 &screen_size, float dt) override;
   void render_ui(entt::registry &registry) override;
 
  private:

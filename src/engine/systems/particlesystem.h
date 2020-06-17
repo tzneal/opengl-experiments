@@ -22,11 +22,11 @@ struct ParticleEmitter {
   common::ColorMap ColorMap;
 };
 
-class ParticleSystem : public RenderSystem, public System {
+class ParticleSystem : public RenderSystem, public UpdateSystem {
  public:
   explicit ParticleSystem();
-  void render(entt::registry &registry) override;
-  void update(entt::registry &registry, float dt) override;
+  void render(entt::registry &registry, const glm::vec2 &screen_size) override;
+  void update(entt::registry &registry, const glm::vec2 &screen_size, float dt) override;
 
   int add_emitter(const ParticleEmitter &emitter);
 

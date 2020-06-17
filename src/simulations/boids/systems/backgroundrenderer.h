@@ -8,7 +8,7 @@
 class BackgroundRenderer : public engine::RenderSystem {
  public:
   BackgroundRenderer();
-  void render(entt::registry &registry) override;
+  void render(entt::registry &registry, const glm::vec2 &screen_size) override;
 
  private:
   engine::SpriteRenderer sprite;

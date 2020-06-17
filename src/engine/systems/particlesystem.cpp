@@ -24,7 +24,7 @@ bool inited = []() -> bool {
 }  // namespace
 
 ParticleSystem::ParticleSystem() {}
-void ParticleSystem::render(entt::registry& registry) {
+void ParticleSystem::render(entt::registry& registry, const glm::vec2& screen_size) {
   particleProg.bind();
 
   bool additiveBlending = false;
@@ -42,7 +42,7 @@ void ParticleSystem::render(entt::registry& registry) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
 }
-void ParticleSystem::update(entt::registry& registry, float dt) {
+void ParticleSystem::update(entt::registry& registry, const glm::vec2& screen_size, float dt) {
   for (auto& empair : emitters) {
     auto& em = empair.second;
 

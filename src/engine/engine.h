@@ -9,6 +9,7 @@
 #include <SDL2/SDL_video.h>
 #include <nanovg.h>
 #include <entt/entt.hpp>
+#include <glm/glm.hpp>
 #include <sigslot/signal.hpp>
 
 namespace engine {
@@ -29,13 +30,13 @@ class Engine {
   void render_frame();
   bool running();
   void poll();
+  void set_clear_color(const glm::vec3 &color);
 
   void add_ui_system(std::shared_ptr<UISystem> &&system);
-  void add_update_system(std::shared_ptr<System> &&system);
+  void add_update_system(std::shared_ptr<UpdateSystem> &&system);
   void add_render_system(std::shared_ptr<RenderSystem> &&system);
   entt::entity create_entity();
   void update();
-
   entt::registry &get_registry();
 
  private:
@@ -51,15 +52,15 @@ class Engine {
   bool shutdown{false};
   entt::registry registry;
   std::vector<std::shared_ptr<UISystem>> ui_systems;
-  std::vector<std::shared_ptr<System>> update_systems;
+  std::vector<std::shared_ptr<UpdateSystem>> update_systems;
   std::vector<std::shared_ptr<RenderSystem>> render_systems;
   bool debug{true};
   EngineInitParams params;
-  std::filesystem::path asset_dir;
   SDL_GLContext gl_context;
   std::string glsl_version;
   Uint32 previousTicks{0};
   NVGcontext *nvg{0};
+  glm::vec3 clear_color{0, 0, 0};
 };
 }  // namespace engine
 #endif

@@ -6,10 +6,14 @@
 
 int main() {
   engine::Engine eng;
-  if (!eng.init()) {
+  engine::EngineInitParams params;
+  params.WindowTitle = "Boids";
+  if (!eng.init(params)) {
     spdlog::error("error initializing engine");
     exit(1);
   }
+
+  eng.set_clear_color(glm::vec3{0, 0, 0.2});
 
   auto boids = std::make_shared<BoidRenderer>();
   eng.add_render_system(boids);
