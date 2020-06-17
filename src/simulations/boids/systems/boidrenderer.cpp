@@ -6,9 +6,6 @@
 #include <glm/gtx/component_wise.hpp>
 
 namespace {
-struct Boid {
-  float rotation{0};
-};
 glm::vec2 limit_mag(const glm::vec2 &vec, float v) {
   if (glm::compAdd(glm::abs(vec)) <= v) {
     return vec;
@@ -21,8 +18,8 @@ void BoidRenderer::render(entt::registry &registry, const glm::vec2 &screen_size
   static const NVGpaint paint =
       nvgLinearGradient(nvg, 0, 0, size, 0, nvgRGBf(0, 0, 0), nvgRGBf(1, 0, 0));
 
-  auto view = registry.view<engine::Position, engine::Velocity, Boid>();
-  view.each([nvg, this](auto &pos, auto &vel, auto &boid) {
+  auto view = registry.view<engine::Position, engine::Velocity>();
+  view.each([nvg, this](auto &pos, auto &vel) {
     nvgSave(nvg);
     nvgBeginPath(nvg);
     nvgTranslate(nvg, pos.Value.x, pos.Value.y);
@@ -38,7 +35,7 @@ void BoidRenderer::render(entt::registry &registry, const glm::vec2 &screen_size
 }
 
 void BoidRenderer::update(entt::registry &registry, const glm::vec2 &screen_size, float dt) {
-  auto view = registry.view<engine::Position, engine::Velocity, Boid>();
+  auto view = registry.view<engine::Position, engine::Velocity>();
   while (view.size() > num_boids) {
     auto beg = view.begin();
     for (int i = 0; i < num_boids; i++) {
@@ -52,11 +49,10 @@ void BoidRenderer::update(entt::registry &registry, const glm::vec2 &screen_size
     auto ent = registry.create();
     registry.emplace<engine::Position>(ent, engine::Position{{pos_x(gen), pos_y(gen)}});
     registry.emplace<engine::Velocity>(ent, engine::Velocity{{vel_dist(gen), vel_dist(gen)}});
-    registry.emplace<Boid>(ent, Boid{});
   }
 
   if (reset) {
-    view.each([this, &pos_x, &pos_y, &vel_dist](auto &pos, auto &vel, auto &boid) {
+    view.each([this, &pos_x, &pos_y, &vel_dist](auto &pos, auto &vel) {
       pos.Value.x = pos_x(gen);
       pos.Value.y = pos_y(gen);
       vel.Value.x = vel_dist(gen);
@@ -65,6 +61,7 @@ void BoidRenderer::update(entt::registry &registry, const glm::vec2 &screen_size
     reset = false;
     return;
   }
+
   // nothing to do
   if (num_boids == 0) {
     return;
@@ -90,6 +87,7 @@ void BoidRenderer::update(entt::registry &registry, const glm::vec2 &screen_size
         // too far away to care
         continue;
       }
+
       nNearby++;
       align += (vel.Value - vel2.Value);
       approach += (pos.Value - pos2.Value);
@@ -100,7 +98,7 @@ void BoidRenderer::update(entt::registry &registry, const glm::vec2 &screen_size
 
     if (nNearby > 0) {
       align /= static_cast<float>(nNearby);
-      vel.Value += limit_mag(avoid_collisions, 5.0f);
+      vel.Value += limit_mag(avoid_collisions, 1.0f) * 10.0f;
       vel.Value -= limit_mag(align, 1.0f);
       vel.Value -= limit_mag(approach, 1.0f);
     }

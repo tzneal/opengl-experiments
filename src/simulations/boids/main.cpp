@@ -13,7 +13,7 @@ int main() {
     exit(1);
   }
 
-  eng.set_clear_color(glm::vec3{0, 0, 0.2});
+  eng.set_clear_color(glm::vec3{0.6, 0.6, 1.0});
 
   auto boids = std::make_shared<BoidRenderer>();
   eng.add_render_system(boids);
