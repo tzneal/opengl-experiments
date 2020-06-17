@@ -1,0 +1,4 @@
+namespace version {
+const char * Version = "@VERSION_LONG@";
+const char * VersionDate = "@VERSION_DATE@";
+}

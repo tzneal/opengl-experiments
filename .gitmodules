@@ -1,0 +1,15 @@
+[submodule "src/thirdparty/spdlog"]
+	path = src/thirdparty/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "src/thirdparty/entt"]
+	path = src/thirdparty/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "src/thirdparty/imgui/imgui"]
+	path = src/thirdparty/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "src/thirdparty/nanovg/nanovg"]
+	path = src/thirdparty/nanovg/nanovg
+	url = https://github.com/memononen/nanovg.git
+[submodule "src/thirdparty/glm"]
+	path = src/thirdparty/glm
+	url = https://github.com/g-truc/glm.git
